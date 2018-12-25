@@ -76,6 +76,11 @@ class DiscordAuthenticator < ::Auth::OAuth2Authenticator
                         strategy.options[:client_secret] = SiteSetting.discord_secret
                       }
   end
+    
+  def description_for_user(user)
+    info = Oauth2UserInfo.find_by(user_id: user.id, provider: @name)
+    info&.uid || ""
+  end
 
   protected
 
@@ -85,11 +90,6 @@ class DiscordAuthenticator < ::Auth::OAuth2Authenticator
     Jobs.enqueue(:download_avatar_from_url, url: avatar_url, user_id: user.id, override_gravatar: false)
   end
     
-    
-  def description_for_user(user)
-    info = Oauth2UserInfo.find_by(user_id: user.id, provider: @name)
-    info&.uid || ""
-  end
 end
 
 auth_provider :title => 'with Discord',
